@@ -1,19 +1,18 @@
-import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateProfileDTO } from './dto/create-profile.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
+import { CreateProfileDTO } from './dto/create-profile.dto';
 import { UpdateProfileDTO } from './dto/update-profile.dto';
-import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
 
 @Injectable()
 export class ProfilesService {
   private profiles = [
     {
-      id: 'prof-1',
+      id: randomUUID(),
       name: 'Name 1',
       description: 'Description 1',
     },
     {
-      id: 'prof-2',
+      id: randomUUID(),
       name: 'Name 2',
       description: 'Description 2',
     },
