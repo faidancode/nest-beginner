@@ -1,43 +1,56 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Put, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  NotFoundException,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { CreateProfileDTO } from './dto/create-profile.dto';
 import { UpdateProfileDTO } from './dto/update-profile.dto';
+import { ProfilesService } from './profiles.service';
 
 @Controller('profiles')
 export class ProfilesController {
+  constructor(private profileService: ProfilesService) {}
   // GET /profiles
   @Get()
-  findAll(@Query('location') location: string) {
-    return [{ location }];
+  findAll() {
+    return this.profileService.findAll();
   }
 
   // GET /profiles/:id
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return { id };
+    return this.profileService.findOne(id);
   }
 
   // POST /profiles
   @Post()
   create(@Body() createProfileDTO: CreateProfileDTO) {
-    return {
-      name: createProfileDTO.name,
-      description: createProfileDTO.description,
-    };
+    return this.profileService.create(createProfileDTO);
   }
 
   // PUT /profiles/:id
   @Put(':id')
-  update(@Param('id') id: string, @Body() UpdateProfileDTO: UpdateProfileDTO) {
-    return {
-      id,
-      ...UpdateProfileDTO,
-    };
+  update(@Param('id') id: string, @Body() updateProfileDTO: UpdateProfileDTO) {
+    return this.profileService.update(id, updateProfileDTO);
   }
 
   // DELETE /profiles/:id
-  @Delete(":id")
+  @Delete(':id')
   @HttpCode(HttpStatus.OK)
-  remove(@Param('id') id:string){
-    return
+  remove(@Param('id') id: string) {
+    const isDeleted = this.profileService.delete(id);
+
+    if (!isDeleted) {
+      throw new NotFoundException(`Profile ${id} not found`);
+    }
+    return isDeleted;
   }
 }
