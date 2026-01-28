@@ -44,13 +44,7 @@ export class ProfilesController {
 
   // DELETE /profiles/:id
   @Delete(':id')
-  @HttpCode(HttpStatus.OK)
   remove(@Param('id') id: string) {
-    const isDeleted = this.profileService.delete(id);
-
-    if (!isDeleted) {
-      throw new NotFoundException(`Profile ${id} not found`);
-    }
-    return isDeleted;
+    return this.profileService.delete(id);
   }
 }

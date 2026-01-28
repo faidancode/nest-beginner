@@ -1,7 +1,8 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProfileDTO } from './dto/create-profile.dto';
 import { randomUUID } from 'crypto';
 import { UpdateProfileDTO } from './dto/update-profile.dto';
+import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler';
 
 @Injectable()
 export class ProfilesService {
@@ -23,7 +24,12 @@ export class ProfilesService {
   }
 
   findOne(id: string) {
-    return this.profiles.find((profile) => profile.id === id);
+    const matchingProfile = this.profiles.find((profile) => profile.id === id);
+    if (!matchingProfile) {
+      throw new NotFoundException(`Profile ${id} not found`);
+    }
+
+    return matchingProfile;
   }
 
   create(createProfileDTO: CreateProfileDTO) {
@@ -42,7 +48,7 @@ export class ProfilesService {
     );
 
     if (!matchingProfile) {
-      return HttpStatus.NOT_FOUND;
+      throw new NotFoundException(`profile ${id} not found`);
     }
 
     matchingProfile.name = updateProfileDTO.name;
@@ -54,11 +60,14 @@ export class ProfilesService {
     const index = this.profiles.findIndex((profile) => profile.id === id);
 
     if (index === -1) {
-      return false;
+      throw new NotFoundException(`Profile ${id} not found`);
     }
 
     this.profiles.splice(index, 1);
 
-    return true;
+    return {
+      status: 'OK',
+      message: `Profile with ID ${id} deleted successfully`,
+    };
   }
 }
